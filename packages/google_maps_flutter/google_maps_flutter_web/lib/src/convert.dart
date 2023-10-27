@@ -398,6 +398,81 @@ bool _isPolygonClockwise(List<gmaps.LatLng> path) {
   return direction >= 0;
 }
 
+/// Return the SVG [path] and total [length] generated from the [patterns].
+///
+/// Walks the [patterns] adding the appropriate SVG `instructions`. For each
+/// [PatternItem] an SVG `moveto` is optionally added as follows:
+/// For [PatternItem.dot] `M0 y 0 y`.
+/// For [PatternItem.dash] `M0 y 0 y += length`.
+/// For [PatternItem.gap] y is just incremented `y += length`.
+///
+/// This draws a line in the y-direction with dots, dashes and gaps that match
+/// the [pattern].
+///
+/// Reference https://www.w3.org/TR/SVG2/paths.html#PathDataGeneralInformation.
+({String path, double length}) _gSymbolPathFromPatterns(
+    List<PatternItem> patterns) {
+  // Starting SVG path string.
+  String path = 'M';
+
+  // Starting y coordinate.
+  double y = 0;
+
+  // Generates the `moveto`.
+  String svgMoveToFromLength(double length) => '0 $y 0 ${y += length} ';
+
+  for (final PatternItem pattern in patterns) {
+    // Cast to list.
+    final List<Object> patternJson = pattern.toJson() as List<Object>;
+
+    // Switch on the PatternItem type.
+    switch (patternJson.first) {
+      case 'dot':
+        path += svgMoveToFromLength(0);
+        break;
+      case 'dash':
+        path += svgMoveToFromLength(patternJson.last as double);
+        break;
+      case 'gap':
+        y += patternJson.last as double;
+        break;
+      default:
+        throw UnimplementedError(
+            'PatternItem ${patternJson.first} is not implemented');
+    }
+  }
+
+  return (path: path, length: y);
+}
+
+/// Generates equivalent the [PolylineOptions.icons] for the [polyline.pattern].
+///
+/// See https://developers.google.com/maps/documentation/javascript/symbols#custom_paths
+///
+List<gmaps.IconSequence>? _polylineOptionIconsFromPolyline(Polyline polyline) {
+  // Return null if there is no pattern.
+  if (polyline.patterns.isEmpty) {
+    return null;
+  }
+
+  /// This scale seems to make for a good match between mobile and web.
+  const double scale = 0.4;
+
+  final ({double length, String path}) gSymbolPath =
+      _gSymbolPathFromPatterns(polyline.patterns);
+
+  return <gmaps.IconSequence>[
+    gmaps.IconSequence()
+      ..repeat = '${gSymbolPath.length * scale + polyline.width}px'
+      ..icon = (gmaps.GSymbol()
+        ..strokeColor = _getCssColor(polyline.color)
+        ..path = gSymbolPath.path
+        ..scale = scale
+        ..strokeWeight = polyline.width
+        ..strokeOpacity = _getCssOpacity(polyline.color))
+  ];
+}
+
 gmaps.PolylineOptions _polylineOptionsFromPolyline(
     gmaps.GMap googleMap, Polyline polyline) {
   final List<gmaps.LatLng> paths =
@@ -408,14 +483,16 @@ gmaps.PolylineOptions _polylineOptionsFromPolyline(
     ..strokeWeight = polyline.width
     ..strokeColor = _getCssColor(polyline.color)
     ..strokeOpacity = _getCssOpacity(polyline.color)
+    ..strokeOpacity = polyline.patterns.isNotEmpty
+        ? _getCssOpacity(Colors.transparent)
+        : _getCssOpacity(polyline.color)
     ..visible = polyline.visible
     ..zIndex = polyline.zIndex
-    ..geodesic = polyline.geodesic;
+    ..geodesic = polyline.geodesic
+    ..icons = _polylineOptionIconsFromPolyline(polyline);
 //  this.endCap = Cap.buttCap,
 //  this.jointType = JointType.mitered,
-//  this.patterns = const <PatternItem>[],
 //  this.startCap = Cap.buttCap,
-//  this.width = 10,
 }
 
 // Translates a [CameraUpdate] into operations on a [gmaps.GMap].

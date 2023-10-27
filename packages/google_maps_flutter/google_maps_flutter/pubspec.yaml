@@ -24,7 +24,8 @@ dependencies:
   google_maps_flutter_android: ^2.5.0
   google_maps_flutter_ios: ^2.3.0
   google_maps_flutter_platform_interface: ^2.4.0
-  google_maps_flutter_web: ^0.5.2
+  google_maps_flutter_web: #^0.5.2 TODO revert
+    path: C:/workspace/flutter_packages/packages/google_maps_flutter/google_maps_flutter_web
 
 dev_dependencies:
   flutter_test:
