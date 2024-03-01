@@ -30,7 +30,7 @@ dependencies:
   google_maps_flutter_web: # KNOWN ISSUE TODO revert to ^2.5.0
     git:
       url: git@github.com:BMEC/flutter_packages.git
-      ref: ^0.0.1
+      ref: ^0.0.2
       path: packages/google_maps_flutter/google_maps_flutter_web
 
 dev_dependencies:
