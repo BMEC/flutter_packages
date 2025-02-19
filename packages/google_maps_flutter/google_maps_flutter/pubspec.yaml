@@ -27,10 +27,10 @@ dependencies:
   # KNOWN ISSUE: as a result of issue https://github.com/flutter/packages/pull/3895 a fork was
   # made (https://github.com/BMEC/flutter_packages) and is being used until the issue is resolved.
   # Once resolved, we should revert to https://github.com/flutter/packages.
-  google_maps_flutter_web: # KNOWN ISSUE TODO revert to ^2.5.0
+  google_maps_flutter_web: # KNOWN ISSUE TODO revert to ^2.10.0
     git:
       url: git@github.com:BMEC/flutter_packages.git
-      ref: ^0.0.1
+      ref: ^1.0.0
       path: packages/google_maps_flutter/google_maps_flutter_web
 
 dev_dependencies:
