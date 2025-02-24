@@ -647,9 +647,9 @@ List<gmaps.IconSequence>? _polylineOptionIconsFromPolyline(Polyline polyline) {
   return <gmaps.IconSequence>[
     gmaps.IconSequence()
       ..repeat = '${gSymbolPath.length * scale + polyline.width}px'
-      ..icon = (gmaps.GSymbol()
+      ..icon = (gmaps.Symbol()
         ..strokeColor = _getCssColor(polyline.color)
-        ..path = gSymbolPath.path
+        ..path = gSymbolPath.path.toJS
         ..scale = scale
         ..strokeWeight = polyline.width
         ..strokeOpacity = _getCssOpacity(polyline.color))
