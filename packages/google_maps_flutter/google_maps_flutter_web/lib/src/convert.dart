@@ -593,7 +593,7 @@ bool _isPolygonClockwise(List<gmaps.LatLng> path) {
 /// the [pattern].
 ///
 /// Reference https://www.w3.org/TR/SVG2/paths.html#PathDataGeneralInformation.
-({String path, double length}) _gSymbolPathFromPatterns(
+({String path, double length}) _symbolPathFromPatterns(
     List<PatternItem> patterns) {
   // Starting SVG path string.
   String path = 'M';
@@ -641,15 +641,15 @@ List<gmaps.IconSequence>? _polylineOptionIconsFromPolyline(Polyline polyline) {
   /// This scale seems to make for a good match between mobile and web.
   const double scale = 0.4;
 
-  final ({double length, String path}) gSymbolPath =
-      _gSymbolPathFromPatterns(polyline.patterns);
+  final ({double length, String path}) symbolPath =
+      _symbolPathFromPatterns(polyline.patterns);
 
   return <gmaps.IconSequence>[
     gmaps.IconSequence()
-      ..repeat = '${gSymbolPath.length * scale + polyline.width}px'
+      ..repeat = '${symbolPath.length * scale + polyline.width}px'
       ..icon = (gmaps.Symbol()
         ..strokeColor = _getCssColor(polyline.color)
-        ..path = gSymbolPath.path.toJS
+        ..path = symbolPath.path.toJS
         ..scale = scale
         ..strokeWeight = polyline.width
         ..strokeOpacity = _getCssOpacity(polyline.color))
